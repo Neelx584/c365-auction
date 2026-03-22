@@ -186,7 +186,7 @@ export default function App() {
     <div style={{fontFamily:"'Inter',sans-serif",minHeight:"100vh",background:"#050508",color:"#e2e8f0"}}>
       <style>{CSS}</style>
       <GlowCanvas />
-      <TopBar screen={screen} setScreen={setScreen} hasAuction={!!auction} role={role} roleLabel={roleLabel} syncStatus={syncStatus} />
+      <TopBar screen={screen} setScreen={setScreen} hasAuction={!!auction} role={role} roleLabel={roleLabel} syncStatus={syncStatus} onHome={()=>{ setRole(null); setRoleLabel(""); setScreen("login"); }} />
       {screen==="login"   && <LoginScreen teams={teams} auction={auction} syncStatus={syncStatus} saves={saves} onDeleteSave={deleteSave} onResumeSave={resumeSave} onLogin={(r,lbl,cfg,code)=>{setRole(r);setRoleLabel(lbl);if(cfg&&code&&r!=="host"){joinRoom(cfg,code);}setScreen(r==="host"?"setup":"auction");}} />}
       {screen==="setup"   && role==="host" && <SetupScreen teams={teams} setTeams={setTeams} sets={sets} setSets={setSets} onStart={startAuction} syncStatus={syncStatus} />}
       {screen==="auction" && auction && <AuctionScreen auction={auction} setAuction={setAuctionSync} setScreen={setScreen} role={role} syncStatus={syncStatus} onSave={saveAuction} />}
@@ -237,7 +237,7 @@ function GlowCanvas() {
 }
 
 /* ── TOP BAR ── */
-function TopBar({ screen, setScreen, hasAuction, role, roleLabel, syncStatus }) {
+function TopBar({ screen, setScreen, hasAuction, role, roleLabel, syncStatus, onHome }) {
   const [showHelp, setShowHelp] = useState(false);
   return (
     <>
@@ -257,6 +257,7 @@ function TopBar({ screen, setScreen, hasAuction, role, roleLabel, syncStatus }) 
           {syncStatus==="live"?"🟢 LIVE":syncStatus==="connecting"?"⏳":syncStatus==="error"?"🔴 ERR":""}
         </div>
       )}
+      {role && <button className="home-btn" onClick={onHome} title="Return to home">⌂</button>}
       <button className="help-btn" onClick={()=>setShowHelp(true)} title="Help">?</button>
     </div>
     {showHelp && <HelpModal role={role} onClose={()=>setShowHelp(false)} />}
@@ -2358,6 +2359,14 @@ const CSS = `
   .login-opt .opt-desc{font-size:.72rem;color:var(--muted)}
 
   /* ── help button ── */
+  .home-btn{
+    width:28px;height:28px;border-radius:50%;
+    background:var(--surface2);border:1px solid var(--border-glow);
+    color:var(--muted);font-size:1rem;
+    cursor:pointer;display:flex;align-items:center;justify-content:center;
+    transition:all .2s;flex-shrink:0;
+  }
+  .home-btn:hover{background:var(--surface);color:var(--text);border-color:var(--iris);box-shadow:0 0 10px #b09dff33}
   .help-btn{
     width:28px;height:28px;border-radius:50%;
     background:var(--surface2);border:1px solid var(--border-glow);
@@ -2682,5 +2691,6 @@ const CSS = `
   .bulk-controls .btn-add{flex:1;min-width:120px}
   ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border-glow);border-radius:2px}
 `;
+
 
 
